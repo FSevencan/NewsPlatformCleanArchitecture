@@ -2,6 +2,7 @@ using Application.Features.Polls.Commands.Create;
 using Application.Features.Polls.Commands.Delete;
 using Application.Features.Polls.Commands.Update;
 using Application.Features.Polls.Queries.GetById;
+using Application.Features.Polls.Queries.GetLatestPoll;
 using Application.Features.Polls.Queries.GetList;
 using Core.Application.Requests;
 using Core.Application.Responses;
@@ -41,6 +42,13 @@ public class PollsController : BaseController
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {
         GetByIdPollResponse response = await Mediator.Send(new GetByIdPollQuery { Id = id });
+        return Ok(response);
+    }
+
+    [HttpGet("latest")]
+    public async Task<IActionResult> GetLatest()
+    {
+        var response = await Mediator.Send(new GetLatestPollQuery());
         return Ok(response);
     }
 

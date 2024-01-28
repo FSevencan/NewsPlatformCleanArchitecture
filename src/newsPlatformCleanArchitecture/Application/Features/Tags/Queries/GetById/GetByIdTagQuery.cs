@@ -9,7 +9,7 @@ using static Application.Features.Tags.Constants.TagsOperationClaims;
 
 namespace Application.Features.Tags.Queries.GetById;
 
-public class GetByIdTagQuery : IRequest<GetByIdTagResponse>, ISecuredRequest
+public class GetByIdTagQuery : IRequest<GetByIdTagResponse>
 {
     public Guid Id { get; set; }
 

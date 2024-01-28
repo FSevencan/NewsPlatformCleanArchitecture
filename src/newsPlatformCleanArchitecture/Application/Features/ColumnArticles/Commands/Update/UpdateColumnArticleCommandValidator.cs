@@ -12,7 +12,6 @@ public class UpdateColumnArticleCommandValidator : AbstractValidator<UpdateColum
         RuleFor(c => c.Title).NotEmpty();
         RuleFor(c => c.Content).NotEmpty();
         RuleFor(c => c.FeaturedImage).NotEmpty();
-        RuleFor(c => c.Columnist).NotEmpty();
-        RuleFor(c => c.Category).NotEmpty();
+       
     }
 }

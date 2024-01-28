@@ -68,10 +68,10 @@ public class ArticlesController : BaseController
     }
 
 
-    [HttpGet("mixed-latest-articles")]
-    public async Task<IActionResult> GetMixedLatestArticles([FromQuery] int maxResults, [FromQuery] string[] excludeCategories)
+    [HttpGet("latest-articles-excluding-categories")]
+    public async Task<IActionResult> GetLatestArticlesExcludingCategories([FromQuery] int maxResults, [FromQuery] string[] excludeCategories)
     {
-        var query = new GetMixedLatestArticlesQuery
+        var query = new GetLatestArticlesExcludingCategoriesQuery
         {
             MaxResult = maxResults,
             ExcludeCategories = excludeCategories
@@ -79,7 +79,7 @@ public class ArticlesController : BaseController
 
         var response = await Mediator.Send(query);
 
-         return Ok(response);
+        return Ok(response);
     }
 
 }

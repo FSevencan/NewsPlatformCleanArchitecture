@@ -12,7 +12,7 @@ using static Application.Features.Tags.Constants.TagsOperationClaims;
 
 namespace Application.Features.Tags.Queries.GetList;
 
-public class GetListTagQuery : IRequest<GetListResponse<GetListTagListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListTagQuery : IRequest<GetListResponse<GetListTagListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
@@ -36,11 +36,13 @@ public class GetListTagQuery : IRequest<GetListResponse<GetListTagListItemDto>>,
 
         public async Task<GetListResponse<GetListTagListItemDto>> Handle(GetListTagQuery request, CancellationToken cancellationToken)
         {
-            IPaginate<Tag> tags = await _tagRepository.GetListAsync(
-                index: request.PageRequest.PageIndex,
-                size: request.PageRequest.PageSize, 
-                cancellationToken: cancellationToken
-            );
+              IPaginate<Tag> tags = await _tagRepository.GetListAsync(
+               orderBy: q => q.OrderBy(x => Guid.NewGuid()), 
+               index: request.PageRequest.PageIndex,
+               size: request.PageRequest.PageSize,
+               cancellationToken: cancellationToken
+               );
+
 
             GetListResponse<GetListTagListItemDto> response = _mapper.Map<GetListResponse<GetListTagListItemDto>>(tags);
             return response;

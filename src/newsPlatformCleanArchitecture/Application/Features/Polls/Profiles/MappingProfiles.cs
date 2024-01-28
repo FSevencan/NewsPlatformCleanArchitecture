@@ -7,6 +7,7 @@ using AutoMapper;
 using Core.Application.Responses;
 using Domain.Entities;
 using Core.Persistence.Paging;
+using Application.Features.Polls.Queries.GetLatestPoll;
 
 namespace Application.Features.Polls.Profiles;
 
@@ -22,6 +23,9 @@ public class MappingProfiles : Profile
         CreateMap<Poll, DeletedPollResponse>().ReverseMap();
         CreateMap<Poll, GetByIdPollResponse>().ReverseMap();
         CreateMap<Poll, GetListPollListItemDto>().ReverseMap();
+
+        CreateMap<Poll, GetLatestPollResponse>().ReverseMap();
+       
         CreateMap<IPaginate<Poll>, GetListResponse<GetListPollListItemDto>>().ReverseMap();
     }
 }

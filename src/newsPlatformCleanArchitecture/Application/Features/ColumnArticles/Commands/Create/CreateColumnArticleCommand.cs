@@ -19,8 +19,7 @@ public class CreateColumnArticleCommand : IRequest<CreatedColumnArticleResponse>
     public string Title { get; set; }
     public string Content { get; set; }
     public string FeaturedImage { get; set; }
-    public Columnist Columnist { get; set; }
-    public Category Category { get; set; }
+
 
     public string[] Roles => new[] { Admin, Write, ColumnArticlesOperationClaims.Create };
 

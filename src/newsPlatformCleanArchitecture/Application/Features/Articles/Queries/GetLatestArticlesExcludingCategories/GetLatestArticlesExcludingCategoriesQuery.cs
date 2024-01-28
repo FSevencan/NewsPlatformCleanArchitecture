@@ -15,7 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Features.Articles.Queries.GetMixedLatestArticles;
-public class GetMixedLatestArticlesQuery : IRequest<GetListResponse<GetListArticleListItemDto>>, ICachableRequest
+public class GetLatestArticlesExcludingCategoriesQuery : IRequest<GetListResponse<GetListArticleListItemDto>>, ICachableRequest
 {
     public int MaxResult { get; set; }
     public string[] ExcludeCategories { get; set; }
@@ -27,7 +27,7 @@ public class GetMixedLatestArticlesQuery : IRequest<GetListResponse<GetListArtic
     public TimeSpan? SlidingExpiration { get; set; }
 }
 
-public class GetMixedLatestArticlesQueryHandler : IRequestHandler<GetMixedLatestArticlesQuery, GetListResponse<GetListArticleListItemDto>>
+public class GetMixedLatestArticlesQueryHandler : IRequestHandler<GetLatestArticlesExcludingCategoriesQuery, GetListResponse<GetListArticleListItemDto>>
 {
     private readonly IArticleRepository _articleRepository;
     private readonly IMapper _mapper;
@@ -38,7 +38,7 @@ public class GetMixedLatestArticlesQueryHandler : IRequestHandler<GetMixedLatest
         _mapper = mapper;
     }
 
-    public async Task<GetListResponse<GetListArticleListItemDto>> Handle(GetMixedLatestArticlesQuery request, CancellationToken cancellationToken)
+    public async Task<GetListResponse<GetListArticleListItemDto>> Handle(GetLatestArticlesExcludingCategoriesQuery request, CancellationToken cancellationToken)
     {
         
         var articles = await _articleRepository.GetListAsync(
