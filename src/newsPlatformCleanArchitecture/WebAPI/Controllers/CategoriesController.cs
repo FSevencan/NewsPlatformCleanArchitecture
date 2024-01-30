@@ -1,6 +1,7 @@
 using Application.Features.Categories.Commands.Create;
 using Application.Features.Categories.Commands.Delete;
 using Application.Features.Categories.Commands.Update;
+using Application.Features.Categories.Queries.GetArticlesByCategory;
 using Application.Features.Categories.Queries.GetById;
 using Application.Features.Categories.Queries.GetList;
 using Core.Application.Requests;
@@ -51,4 +52,17 @@ public class CategoriesController : BaseController
         GetListResponse<GetListCategoryListItemDto> response = await Mediator.Send(getListCategoryQuery);
         return Ok(response);
     }
+
+    [HttpGet("{categoryName}/articles")]
+    public async Task<IActionResult> GetArticlesByCategory([FromRoute] string categoryName)
+    {
+        var getArticlesByCategoryQuery = new GetArticlesByCategoryQuery
+        {
+            CategoryName = categoryName,
+            
+        };
+        var response = await Mediator.Send(getArticlesByCategoryQuery);
+        return Ok(response);
+    }
+
 }

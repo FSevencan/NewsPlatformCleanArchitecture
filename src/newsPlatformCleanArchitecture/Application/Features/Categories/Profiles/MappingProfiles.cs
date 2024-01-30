@@ -7,6 +7,7 @@ using AutoMapper;
 using Core.Application.Responses;
 using Domain.Entities;
 using Core.Persistence.Paging;
+using Application.Features.Categories.Queries.GetArticlesByCategory;
 
 namespace Application.Features.Categories.Profiles;
 
@@ -26,5 +27,7 @@ public class MappingProfiles : Profile
         .ForMember(dest => dest.TotalArticleCount, opt => opt.MapFrom(src => src.SubCategories.Sum(sc => sc.Articles.Count)));
 
         CreateMap<IPaginate<Category>, GetListResponse<GetListCategoryListItemDto>>().ReverseMap();
+
+       
     }
 }
