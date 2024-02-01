@@ -12,7 +12,6 @@ public class NewsVideoConfiguration : IEntityTypeConfiguration<NewsVideo>
 
         builder.Property(nv => nv.Id).HasColumnName("Id").IsRequired();
         builder.Property(nv => nv.Title).HasColumnName("Title");
-        builder.Property(nv => nv.Description).HasColumnName("Description");
         builder.Property(nv => nv.VideoURL).HasColumnName("VideoURL");
         builder.Property(nv => nv.CreatedDate).HasColumnName("CreatedDate").IsRequired();
         builder.Property(nv => nv.UpdatedDate).HasColumnName("UpdatedDate");

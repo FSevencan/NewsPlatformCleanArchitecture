@@ -54,7 +54,7 @@ public class TagsController : BaseController
         return Ok(response);
     }
 
-    [HttpGet("tags/{tagName}/articles")]
+    [HttpGet("{tagName}/articles")]
     public async Task<IActionResult> GetArticlesByTag(string tagName, [FromQuery] PageRequest pageRequest)
     {
         var getArticlesByTagQuery = new GetArticlesByTagQuery

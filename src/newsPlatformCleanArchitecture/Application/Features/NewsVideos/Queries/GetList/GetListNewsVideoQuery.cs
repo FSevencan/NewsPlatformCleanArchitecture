@@ -12,7 +12,7 @@ using static Application.Features.NewsVideos.Constants.NewsVideosOperationClaims
 
 namespace Application.Features.NewsVideos.Queries.GetList;
 
-public class GetListNewsVideoQuery : IRequest<GetListResponse<GetListNewsVideoListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListNewsVideoQuery : IRequest<GetListResponse<GetListNewsVideoListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
 
@@ -37,6 +37,7 @@ public class GetListNewsVideoQuery : IRequest<GetListResponse<GetListNewsVideoLi
         public async Task<GetListResponse<GetListNewsVideoListItemDto>> Handle(GetListNewsVideoQuery request, CancellationToken cancellationToken)
         {
             IPaginate<NewsVideo> newsVideos = await _newsVideoRepository.GetListAsync(
+                orderBy: v=> v.OrderByDescending(v=>v.CreatedDate),
                 index: request.PageRequest.PageIndex,
                 size: request.PageRequest.PageSize, 
                 cancellationToken: cancellationToken

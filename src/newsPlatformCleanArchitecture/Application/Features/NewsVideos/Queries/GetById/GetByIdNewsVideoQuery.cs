@@ -9,7 +9,7 @@ using static Application.Features.NewsVideos.Constants.NewsVideosOperationClaims
 
 namespace Application.Features.NewsVideos.Queries.GetById;
 
-public class GetByIdNewsVideoQuery : IRequest<GetByIdNewsVideoResponse>, ISecuredRequest
+public class GetByIdNewsVideoQuery : IRequest<GetByIdNewsVideoResponse>
 {
     public Guid Id { get; set; }
 

@@ -15,7 +15,6 @@ namespace Application.Features.NewsVideos.Commands.Create;
 public class CreateNewsVideoCommand : IRequest<CreatedNewsVideoResponse>, ISecuredRequest, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
     public string Title { get; set; }
-    public string? Description { get; set; }
     public string VideoURL { get; set; }
 
     public string[] Roles => new[] { Admin, Write, NewsVideosOperationClaims.Create };

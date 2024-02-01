@@ -16,7 +16,6 @@ public class UpdateNewsVideoCommand : IRequest<UpdatedNewsVideoResponse>, ISecur
 {
     public Guid Id { get; set; }
     public string Title { get; set; }
-    public string? Description { get; set; }
     public string VideoURL { get; set; }
 
     public string[] Roles => new[] { Admin, Write, NewsVideosOperationClaims.Update };
