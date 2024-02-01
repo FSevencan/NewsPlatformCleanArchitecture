@@ -9,6 +9,8 @@ using Domain.Entities;
 using Core.Persistence.Paging;
 using Application.Features.Articles.Queries.GetLatestArticlesByCategory;
 using Application.Features.Categories.Queries.GetArticlesByCategory;
+using Core.Application.Dtos;
+using Application.Features.Tags.Queries.GetArticlesByTag;
 
 namespace Application.Features.Articles.Profiles;
 
@@ -27,18 +29,15 @@ public class MappingProfiles : Profile
 
         CreateMap<Article, GetLastArticleByCategoryItemDto>().ReverseMap();
 
-        CreateMap<Article, GetArticleByCategoryListDto>()
-             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
-             .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
-             .ForMember(dest => dest.SubCategoryName, opt => opt.MapFrom(src => src.SubCategory.Name))
-             .ForMember(dest => dest.FeaturedImage, opt => opt.MapFrom(src => src.FeaturedImage))
-             .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate))
-             
-             ;
-
         CreateMap<Article, GetListArticleListItemDto>().ReverseMap();
-
         CreateMap<IPaginate<Article>, GetListResponse<GetListArticleListItemDto>>().ReverseMap();
+
+        CreateMap<Article, GetArticleByCategoryListDto>().ReverseMap();
+        CreateMap<IPaginate<Article>, GetListResponse<GetArticleByCategoryListDto>>().ReverseMap();
+
+        CreateMap<Article, GetArticleByTagListDto>().ReverseMap();
+        CreateMap<IPaginate<Article>, GetListResponse<GetArticleByTagListDto>>().ReverseMap();
+
 
     }
 }

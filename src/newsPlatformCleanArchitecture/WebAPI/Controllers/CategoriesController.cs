@@ -4,6 +4,7 @@ using Application.Features.Categories.Commands.Update;
 using Application.Features.Categories.Queries.GetArticlesByCategory;
 using Application.Features.Categories.Queries.GetById;
 using Application.Features.Categories.Queries.GetList;
+using Application.Features.Tags.Queries.GetArticlesByTag;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -54,15 +55,16 @@ public class CategoriesController : BaseController
     }
 
     [HttpGet("{categoryName}/articles")]
-    public async Task<IActionResult> GetArticlesByCategory([FromRoute] string categoryName)
+    public async Task<IActionResult> GetArticlesByCategory(string categoryName, [FromQuery] PageRequest pageRequest)
     {
         var getArticlesByCategoryQuery = new GetArticlesByCategoryQuery
         {
             CategoryName = categoryName,
-            
+            PageRequest = pageRequest
         };
-        var response = await Mediator.Send(getArticlesByCategoryQuery);
+        GetListResponse<GetArticleByCategoryListDto> response = await Mediator.Send(getArticlesByCategoryQuery);
         return Ok(response);
     }
+   
 
 }

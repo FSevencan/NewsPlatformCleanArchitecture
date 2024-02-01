@@ -17,39 +17,38 @@ using System.Threading.Tasks;
 
 namespace Application.Features.Categories.Queries.GetArticlesByCategory;
 
-public class GetArticlesByCategoryQuery : IRequest<List<GetArticleByCategoryListDto>>
+public class GetArticlesByCategoryQuery : IRequest<GetListResponse<GetArticleByCategoryListDto>>
 {
-    public string CategoryName { get; set; }
-}
-public class GetArticlesByCategoryQueryHandler : IRequestHandler<GetArticlesByCategoryQuery, List<GetArticleByCategoryListDto>>
-{
-    private readonly ICategoryRepository _categoryRepository;
-    private readonly IMapper _mapper;
+    public PageRequest PageRequest { get; set; }
+    public string CategoryName { get; set; } 
 
-    public GetArticlesByCategoryQueryHandler(ICategoryRepository categoryRepository, IMapper mapper)
+  
+    public class GetArticlesByCategoryQueryHandler : IRequestHandler<GetArticlesByCategoryQuery, GetListResponse<GetArticleByCategoryListDto>>
     {
-        _categoryRepository = categoryRepository;
-        _mapper = mapper;
-    }
+        private readonly IArticleRepository _articleRepository;
+        private readonly IMapper _mapper;
 
-    public async Task<List<GetArticleByCategoryListDto>> Handle(GetArticlesByCategoryQuery request, CancellationToken cancellationToken)
-    {
-        
-        var categoryNameNormalized = request.CategoryName.Replace("-", " ").ToLower();
+        public GetArticlesByCategoryQueryHandler(IArticleRepository articleRepository, IMapper mapper)
+        {
+            _articleRepository = articleRepository;
+            _mapper = mapper;
+        }
 
-        IPaginate<Category> categories = await _categoryRepository.GetListAsync(
-            predicate: c => c.Name.ToLower() == categoryNameNormalized, // Küçük harfe çevirerek karşılaştır
-            include: c => c.Include(sc => sc.SubCategories).ThenInclude(a => a.Articles),
-            cancellationToken: cancellationToken
-        );
+        public async Task<GetListResponse<GetArticleByCategoryListDto>> Handle(GetArticlesByCategoryQuery request, CancellationToken cancellationToken)
+        {
+            var categoryNameNormalized = request.CategoryName.Replace("-", " ").ToLower();
 
-        // SubCategories altındaki Articles'ları liste haline getir.
-        var articles = categories.Items
-            .SelectMany(c => c.SubCategories)
-            .SelectMany(sc => sc.Articles)
-            .ToList();
+            IPaginate<Article> articles = await _articleRepository.GetListAsync(
+                predicate: a => a.SubCategory.Category.Name.ToLower() == categoryNameNormalized, 
+                include: s => s.Include(subCategory => subCategory.SubCategory),
+                orderBy: o => o.OrderByDescending(o => o.CreatedDate),
+                index: request.PageRequest.PageIndex,
+                size: request.PageRequest.PageSize,
+                cancellationToken: cancellationToken
+            );
 
-        List<GetArticleByCategoryListDto> response = _mapper.Map<List<GetArticleByCategoryListDto>>(articles);
-        return response;
+            GetListResponse<GetArticleByCategoryListDto> response = _mapper.Map<GetListResponse<GetArticleByCategoryListDto>>(articles);
+            return response;
+        }
     }
 }

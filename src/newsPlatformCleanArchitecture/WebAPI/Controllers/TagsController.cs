@@ -1,6 +1,8 @@
+using Application.Features.Categories.Queries.GetArticlesByCategory;
 using Application.Features.Tags.Commands.Create;
 using Application.Features.Tags.Commands.Delete;
 using Application.Features.Tags.Commands.Update;
+using Application.Features.Tags.Queries.GetArticlesByTag;
 using Application.Features.Tags.Queries.GetById;
 using Application.Features.Tags.Queries.GetList;
 using Core.Application.Requests;
@@ -51,4 +53,17 @@ public class TagsController : BaseController
         GetListResponse<GetListTagListItemDto> response = await Mediator.Send(getListTagQuery);
         return Ok(response);
     }
+
+    [HttpGet("tags/{tagName}/articles")]
+    public async Task<IActionResult> GetArticlesByTag(string tagName, [FromQuery] PageRequest pageRequest)
+    {
+        var getArticlesByTagQuery = new GetArticlesByTagQuery
+        {
+            TagName = tagName,
+            PageRequest = pageRequest
+        };
+        GetListResponse<GetArticleByTagListDto> response = await Mediator.Send(getArticlesByTagQuery);
+        return Ok(response);
+    }
+
 }
