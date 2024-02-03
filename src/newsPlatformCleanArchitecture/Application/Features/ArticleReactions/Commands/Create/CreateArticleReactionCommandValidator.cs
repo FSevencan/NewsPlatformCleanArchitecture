@@ -7,7 +7,6 @@ public class CreateArticleReactionCommandValidator : AbstractValidator<CreateArt
     public CreateArticleReactionCommandValidator()
     {
         RuleFor(c => c.ArticleId).NotEmpty();
-        RuleFor(c => c.IsLiked).NotEmpty();
         RuleFor(c => c.VoterIdentifier).NotEmpty();
        
     }

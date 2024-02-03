@@ -14,7 +14,7 @@ namespace WebAPI.Controllers;
 [ApiController]
 public class ArticleReactionsController : BaseController
 {
-    [HttpPost]
+    [HttpPost("add")]
     public async Task<IActionResult> Add([FromBody] CreateArticleReactionCommand createArticleReactionCommand)
     {
         CreatedArticleReactionResponse response = await Mediator.Send(createArticleReactionCommand);
@@ -30,11 +30,11 @@ public class ArticleReactionsController : BaseController
         return Ok(response);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete([FromRoute] Guid id)
+    [HttpDelete("{articleId}/{voterIdentifier}")]
+    public async Task<IActionResult> Delete(Guid articleId, string voterIdentifier)
     {
-        DeletedArticleReactionResponse response = await Mediator.Send(new DeleteArticleReactionCommand { Id = id });
-
+        var command = new DeleteArticleReactionCommand { ArticleId = articleId, VoterIdentifier = voterIdentifier };
+        var response = await Mediator.Send(command);
         return Ok(response);
     }
 

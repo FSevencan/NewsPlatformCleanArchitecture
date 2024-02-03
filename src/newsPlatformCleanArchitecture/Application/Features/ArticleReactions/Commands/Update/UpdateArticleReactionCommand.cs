@@ -9,16 +9,16 @@ using Core.Application.Pipelines.Logging;
 using Core.Application.Pipelines.Transaction;
 using MediatR;
 using static Application.Features.ArticleReactions.Constants.ArticleReactionsOperationClaims;
+using Application.Features.Articles.Rules;
 
 namespace Application.Features.ArticleReactions.Commands.Update;
 
 public class UpdateArticleReactionCommand : IRequest<UpdatedArticleReactionResponse>/*, ISecuredRequest*/, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
-    public Guid Id { get; set; }
     public Guid ArticleId { get; set; }
-    public bool IsLiked { get; set; }
     public string VoterIdentifier { get; set; }
- 
+    public bool IsLiked { get; set; }
+
 
     public string[] Roles => new[] { Admin, Write, ArticleReactionsOperationClaims.Update };
 
@@ -30,24 +30,45 @@ public class UpdateArticleReactionCommand : IRequest<UpdatedArticleReactionRespo
     {
         private readonly IMapper _mapper;
         private readonly IArticleReactionRepository _articleReactionRepository;
+        private readonly IArticleRepository _articleRepository;
         private readonly ArticleReactionBusinessRules _articleReactionBusinessRules;
-
+        private readonly ArticleBusinessRules _articleBusinessRules;
         public UpdateArticleReactionCommandHandler(IMapper mapper, IArticleReactionRepository articleReactionRepository,
-                                         ArticleReactionBusinessRules articleReactionBusinessRules)
+                                         IArticleRepository articleRepository, ArticleBusinessRules articleBusinessRules ,ArticleReactionBusinessRules articleReactionBusinessRules)
         {
             _mapper = mapper;
             _articleReactionRepository = articleReactionRepository;
+            _articleRepository = articleRepository;
             _articleReactionBusinessRules = articleReactionBusinessRules;
+            _articleBusinessRules = articleBusinessRules;
         }
 
         public async Task<UpdatedArticleReactionResponse> Handle(UpdateArticleReactionCommand request, CancellationToken cancellationToken)
         {
-            ArticleReaction? articleReaction = await _articleReactionRepository.GetAsync(predicate: ar => ar.Id == request.Id, cancellationToken: cancellationToken);
+            // ArticleId ve VoterIdentifier kullanarak tepkiyi ve makaleyi bul
+            var articleReaction = await _articleReactionRepository.GetAsync(
+                ar => ar.ArticleId == request.ArticleId && ar.VoterIdentifier == request.VoterIdentifier,
+                cancellationToken: cancellationToken
+            );
+
+            // Tepkinin ve makalenin var olduðunu kontrol et
             await _articleReactionBusinessRules.ArticleReactionShouldExistWhenSelected(articleReaction);
-            articleReaction = _mapper.Map(request, articleReaction);
 
-            await _articleReactionRepository.UpdateAsync(articleReaction!);
+            var article = await _articleRepository.GetAsync(
+                a => a.Id == request.ArticleId,
+                cancellationToken: cancellationToken
+            );
 
+            await _articleBusinessRules.ArticleShouldExistWhenSelected(article);
+
+            // Makale tepki sayýlarýný güncelle
+            await _articleReactionBusinessRules.UpdateArticleReactionCountsOnUpdate(article, articleReaction, request.IsLiked, cancellationToken);
+
+            // Tepkinin IsLiked durumunu güncelle ve tepkiyi güncelle
+            articleReaction.IsLiked = request.IsLiked;
+            await _articleReactionRepository.UpdateAsync(articleReaction);
+
+            // Yanýtý oluþtur ve dön
             UpdatedArticleReactionResponse response = _mapper.Map<UpdatedArticleReactionResponse>(articleReaction);
             return response;
         }

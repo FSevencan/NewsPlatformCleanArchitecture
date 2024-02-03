@@ -6,6 +6,6 @@ public class DeleteArticleReactionCommandValidator : AbstractValidator<DeleteArt
 {
     public DeleteArticleReactionCommandValidator()
     {
-        RuleFor(c => c.Id).NotEmpty();
+        RuleFor(c => c.ArticleId).NotEmpty();
     }
 }

@@ -9,6 +9,7 @@ using Core.Application.Pipelines.Logging;
 using Core.Application.Pipelines.Transaction;
 using MediatR;
 using static Application.Features.ArticleReactions.Constants.ArticleReactionsOperationClaims;
+using System.Threading;
 
 namespace Application.Features.ArticleReactions.Commands.Create;
 
@@ -29,73 +30,34 @@ public class CreateArticleReactionCommand : IRequest<CreatedArticleReactionRespo
     {
         private readonly IMapper _mapper;
         private readonly IArticleReactionRepository _articleReactionRepository;
-        private readonly IArticleRepository _articleRepository; // Eklendi
+        private readonly IArticleRepository _articleRepository;
         private readonly ArticleReactionBusinessRules _articleReactionBusinessRules;
 
         public CreateArticleReactionCommandHandler(IMapper mapper, IArticleReactionRepository articleReactionRepository,
-                                         IArticleRepository articleRepository, // Eklendi
+                                         IArticleRepository articleRepository,
                                          ArticleReactionBusinessRules articleReactionBusinessRules)
         {
             _mapper = mapper;
             _articleReactionRepository = articleReactionRepository;
-            _articleRepository = articleRepository; // Eklendi
+            _articleRepository = articleRepository;
             _articleReactionBusinessRules = articleReactionBusinessRules;
         }
 
         public async Task<CreatedArticleReactionResponse> Handle(CreateArticleReactionCommand request, CancellationToken cancellationToken)
         {
-            // TEST ASAMASINDA DUZELTILECEK //
 
+            await _articleReactionBusinessRules.ValidateReactionDoesNotExist(request.ArticleId, request.VoterIdentifier, cancellationToken);
 
-            var existingReaction = await _articleReactionRepository.GetAsync(
-                ar => ar.ArticleId == request.ArticleId && ar.VoterIdentifier == request.VoterIdentifier,
-                cancellationToken: cancellationToken
-            );
+            var articleReaction = _mapper.Map<ArticleReaction>(request);
+            await _articleReactionRepository.AddAsync(articleReaction);
 
-            var article = await _articleRepository.GetAsync(
-                a => a.Id == request.ArticleId, // Makaleyi ArticleId'ye göre filtreleme
-                cancellationToken: cancellationToken
-            );
+            await _articleReactionBusinessRules.UpdateArticleReactionCounts(request.ArticleId, request.IsLiked, cancellationToken);
 
-            if (existingReaction != null)
-            {
-                // Kullanýcýnýn mevcut tepkisini kaldýr ve sayýlarý güncelle
-                if (existingReaction.IsLiked && request.IsLiked)
-                {
-                    // Kullanýcý beðeniyi geri alýyor
-                    article.TotalLikes = (article.TotalLikes ?? 0) - 1;
-                }
-                else if (!existingReaction.IsLiked && !request.IsLiked)
-                {
-                    // Kullanýcý beðenmeme'yi geri alýyor
-                    article.TotalDislikes = (article.TotalDislikes ?? 0) - 1;
-                }
-
-                await _articleReactionRepository.DeleteAsync(existingReaction);
-            }
-            else
-            {
-                // Yeni tepki oluþtur ve sayýlarý güncelle
-                var articleReaction = _mapper.Map<ArticleReaction>(request);
-                await _articleReactionRepository.AddAsync(articleReaction);
-
-                if (request.IsLiked)
-                {
-                    article.TotalLikes = (article.TotalLikes ?? 0) + 1;
-                }
-                else
-                {
-                    article.TotalDislikes = (article.TotalDislikes ?? 0) + 1;
-                }
-            }
-
-            // Makale güncellemelerini kaydet
-            await _articleRepository.UpdateAsync(article);
-
-
-            var response = _mapper.Map<CreatedArticleReactionResponse>(existingReaction);
+           
+            var response = _mapper.Map<CreatedArticleReactionResponse>(articleReaction);
             return response;
         }
+
     }
 }
 

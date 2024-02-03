@@ -10,12 +10,14 @@ using Core.Application.Pipelines.Logging;
 using Core.Application.Pipelines.Transaction;
 using MediatR;
 using static Application.Features.ArticleReactions.Constants.ArticleReactionsOperationClaims;
+using Core.CrossCuttingConcerns.Exceptions.Types;
 
 namespace Application.Features.ArticleReactions.Commands.Delete;
 
 public class DeleteArticleReactionCommand : IRequest<DeletedArticleReactionResponse>/*, ISecuredRequest*/, ICacheRemoverRequest, ILoggableRequest, ITransactionalRequest
 {
-    public Guid Id { get; set; }
+    public Guid ArticleId { get; set; }
+    public string VoterIdentifier { get; set; }
 
     public string[] Roles => new[] { Admin, Write, ArticleReactionsOperationClaims.Delete };
 
@@ -27,24 +29,35 @@ public class DeleteArticleReactionCommand : IRequest<DeletedArticleReactionRespo
     {
         private readonly IMapper _mapper;
         private readonly IArticleReactionRepository _articleReactionRepository;
+        private readonly IArticleRepository _articleRepository;
         private readonly ArticleReactionBusinessRules _articleReactionBusinessRules;
 
-        public DeleteArticleReactionCommandHandler(IMapper mapper, IArticleReactionRepository articleReactionRepository,
+        public DeleteArticleReactionCommandHandler(IMapper mapper, IArticleReactionRepository articleReactionRepository,IArticleRepository articleRepository,
                                          ArticleReactionBusinessRules articleReactionBusinessRules)
         {
             _mapper = mapper;
             _articleReactionRepository = articleReactionRepository;
+            _articleRepository = articleRepository;
             _articleReactionBusinessRules = articleReactionBusinessRules;
         }
 
         public async Task<DeletedArticleReactionResponse> Handle(DeleteArticleReactionCommand request, CancellationToken cancellationToken)
         {
-            ArticleReaction? articleReaction = await _articleReactionRepository.GetAsync(predicate: ar => ar.Id == request.Id, cancellationToken: cancellationToken);
+            var articleReaction = await _articleReactionRepository.GetAsync(
+            ar => ar.ArticleId == request.ArticleId && ar.VoterIdentifier == request.VoterIdentifier,
+            cancellationToken: cancellationToken
+            );
+
+            // Tepkinin var olduðunu kontrol et
             await _articleReactionBusinessRules.ArticleReactionShouldExistWhenSelected(articleReaction);
 
-            await _articleReactionRepository.DeleteAsync(articleReaction!);
+            // Tepkiyi sil
+            await _articleReactionRepository.DeleteAsync(articleReaction);
 
-            DeletedArticleReactionResponse response = _mapper.Map<DeletedArticleReactionResponse>(articleReaction);
+            // Makalenin beðeni/beðenmeme sayýlarýný güncelle
+            await _articleReactionBusinessRules.UpdateArticleReactionCountsOnDelete(articleReaction.ArticleId, articleReaction.IsLiked, cancellationToken);
+
+            var response = _mapper.Map<DeletedArticleReactionResponse>(articleReaction);
             return response;
         }
     }
