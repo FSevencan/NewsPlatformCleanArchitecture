@@ -30,6 +30,7 @@ using Application.Services.SubCategories;
 using Application.Services.Subscribles;
 using Application.Services.Tags;
 using Application.Services.NewsVideos;
+using Application.Services.Middleware;
 
 
 namespace Application;
@@ -75,8 +76,8 @@ public static class ApplicationServiceRegistration
         services.AddScoped<ISubCategoriesService, SubCategoriesManager>();
         services.AddScoped<ISubscriblesService, SubscriblesManager>();
         services.AddScoped<ITagsService, TagsManager>();
-       
-       services.AddScoped<INewsVideosService, NewsVideosManager>();
+        services.AddSingleton<RateLimitingService>();
+        services.AddScoped<INewsVideosService, NewsVideosManager>();
        services.AddScoped<IArticleReactionsService, ArticleReactionsManager>();
        services.AddScoped<IArticlesService, ArticlesManager>();
         return services;
