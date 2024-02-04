@@ -5,6 +5,7 @@ using Application.Features.Articles.Queries.GetById;
 using Application.Features.Articles.Queries.GetLatestArticlesByCategory;
 using Application.Features.Articles.Queries.GetList;
 using Application.Features.Articles.Queries.GetMixedLatestArticles;
+using Application.Features.Articles.Queries.GetMostLikedArticles;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -81,5 +82,15 @@ public class ArticlesController : BaseController
 
         return Ok(response);
     }
+
+
+    [HttpGet("articles/most-liked")]
+    public async Task<IActionResult> GetMostLikedArticles([FromQuery] PageRequest pageRequest)
+    {
+        GetMostLikedArticlesQuery getMostLikedArticlesQuery = new() { PageRequest = pageRequest };
+        GetListResponse<GetMostLikedArticleListDto> response = await Mediator.Send(getMostLikedArticlesQuery);
+        return Ok(response);
+    }
+
 
 }
