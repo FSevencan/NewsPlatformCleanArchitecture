@@ -14,6 +14,6 @@ public class GetArticleByTagListDto : IDto
     public string? Slug { get; set; }
     public string? FeaturedImage { get; set; }
     public DateTime? CreatedDate { get; set; }
-
+    public int? TotalLikes { get; set; }
 
 }
