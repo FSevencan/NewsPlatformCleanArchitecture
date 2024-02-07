@@ -6,6 +6,7 @@ using Application.Features.Articles.Queries.GetLatestArticlesByCategory;
 using Application.Features.Articles.Queries.GetList;
 using Application.Features.Articles.Queries.GetMixedLatestArticles;
 using Application.Features.Articles.Queries.GetMostLikedArticles;
+using Application.Features.Articles.Queries.GetSearchArticles;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -92,5 +93,15 @@ public class ArticlesController : BaseController
         return Ok(response);
     }
 
-
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] PageRequest pageRequest, [FromQuery] string searchTerm)
+    {
+        GetSearchArticlesQuery getSearchArticlesQuery = new()
+        {
+            PageRequest = pageRequest,
+            SearchTerm = searchTerm
+        };
+        GetListResponse<GetSearchArticleListDto> response = await Mediator.Send(getSearchArticlesQuery);
+        return Ok(response);
+    }
 }

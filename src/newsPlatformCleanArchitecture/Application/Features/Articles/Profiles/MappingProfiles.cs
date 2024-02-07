@@ -12,6 +12,7 @@ using Application.Features.Categories.Queries.GetArticlesByCategory;
 using Core.Application.Dtos;
 using Application.Features.Tags.Queries.GetArticlesByTag;
 using Application.Features.Articles.Queries.GetMostLikedArticles;
+using Application.Features.Articles.Queries.GetSearchArticles;
 
 namespace Application.Features.Articles.Profiles;
 
@@ -43,7 +44,10 @@ public class MappingProfiles : Profile
         CreateMap<Article, GetMostLikedArticleListDto>().ReverseMap();
         CreateMap<IPaginate<Article>, GetListResponse<GetMostLikedArticleListDto>>().ReverseMap();
 
+        CreateMap<Article, GetSearchArticleListDto>().ReverseMap();
+        CreateMap<IPaginate<Article>, GetListResponse<GetSearchArticleListDto>>().ReverseMap();
 
+      
     }
 }
 
