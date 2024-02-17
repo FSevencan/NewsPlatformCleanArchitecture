@@ -9,11 +9,10 @@ using static Application.Features.Columnists.Constants.ColumnistsOperationClaims
 
 namespace Application.Features.Columnists.Queries.GetById;
 
-public class GetByIdColumnistQuery : IRequest<GetByIdColumnistResponse>, ISecuredRequest
+public class GetByIdColumnistQuery : IRequest<GetByIdColumnistResponse>
 {
     public Guid Id { get; set; }
 
-    public string[] Roles => new[] { Admin, Read };
 
     public class GetByIdColumnistQueryHandler : IRequestHandler<GetByIdColumnistQuery, GetByIdColumnistResponse>
     {

@@ -8,20 +8,16 @@ using Core.Application.Requests;
 using Core.Application.Responses;
 using Core.Persistence.Paging;
 using MediatR;
-using static Application.Features.ColumnArticles.Constants.ColumnArticlesOperationClaims;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
+using System.Configuration;
 
 namespace Application.Features.ColumnArticles.Queries.GetList;
 
-public class GetListColumnArticleQuery : IRequest<GetListResponse<GetListColumnArticleListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListColumnArticleQuery : IRequest<GetListResponse<GetListColumnArticleListItemDto>> 
 {
     public PageRequest PageRequest { get; set; }
-
-    public string[] Roles => new[] { Admin, Read };
-
-    public bool BypassCache { get; }
-    public string CacheKey => $"GetListColumnArticles({PageRequest.PageIndex},{PageRequest.PageSize})";
-    public string CacheGroupKey => "GetColumnArticles";
-    public TimeSpan? SlidingExpiration { get; }
+    public Guid? CategoryId { get; set; }
 
     public class GetListColumnArticleQueryHandler : IRequestHandler<GetListColumnArticleQuery, GetListResponse<GetListColumnArticleListItemDto>>
     {
@@ -36,12 +32,21 @@ public class GetListColumnArticleQuery : IRequest<GetListResponse<GetListColumnA
 
         public async Task<GetListResponse<GetListColumnArticleListItemDto>> Handle(GetListColumnArticleQuery request, CancellationToken cancellationToken)
         {
+            // Filtreleme fonksiyonu oluþturuyoruz. CategoryId null ise tüm sonuçlar dönecek þekilde ayarlandý.
+            Expression<Func<ColumnArticle, bool>>? filter = request.CategoryId.HasValue
+                ? a => a.CategoryId == request.CategoryId
+                : null;
+
+            // Filtreleme fonksiyonunu GetListAsync metoduna geçirdik
             IPaginate<ColumnArticle> columnArticles = await _columnArticleRepository.GetListAsync(
+                predicate: filter,
+                include: c=> c.Include(c=> c.Columnist).Include(c=> c.Category),
                 index: request.PageRequest.PageIndex,
-                size: request.PageRequest.PageSize, 
+                size: request.PageRequest.PageSize,
                 cancellationToken: cancellationToken
             );
 
+            
             GetListResponse<GetListColumnArticleListItemDto> response = _mapper.Map<GetListResponse<GetListColumnArticleListItemDto>>(columnArticles);
             return response;
         }

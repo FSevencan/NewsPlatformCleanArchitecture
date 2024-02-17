@@ -17,4 +17,5 @@ public class GetLastArticleByCategoryItemDto : IDto
     public string SubCategoryName { get; set; }
     public string Slug { get; set; }
     public DateTime CreatedDate { get; set; }
+    public int? TotalLikes { get; set; }
 }

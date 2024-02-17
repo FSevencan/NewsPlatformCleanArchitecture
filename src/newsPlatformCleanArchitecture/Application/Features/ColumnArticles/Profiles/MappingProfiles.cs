@@ -21,7 +21,11 @@ public class MappingProfiles : Profile
         CreateMap<ColumnArticle, DeleteColumnArticleCommand>().ReverseMap();
         CreateMap<ColumnArticle, DeletedColumnArticleResponse>().ReverseMap();
         CreateMap<ColumnArticle, GetByIdColumnArticleResponse>().ReverseMap();
-        CreateMap<ColumnArticle, GetListColumnArticleListItemDto>().ReverseMap();
+
+        CreateMap<ColumnArticle, GetListColumnArticleListItemDto>()
+       .ForMember(dest => dest.ColumnistName, opt => opt.MapFrom(src => src.Columnist.Name))
+       .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Name));
+
         CreateMap<IPaginate<ColumnArticle>, GetListResponse<GetListColumnArticleListItemDto>>().ReverseMap();
     }
 }

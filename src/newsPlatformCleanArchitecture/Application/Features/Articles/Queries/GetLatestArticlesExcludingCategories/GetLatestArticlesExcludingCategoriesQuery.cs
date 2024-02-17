@@ -15,41 +15,36 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Features.Articles.Queries.GetMixedLatestArticles;
-public class GetLatestArticlesExcludingCategoriesQuery : IRequest<GetListResponse<GetListArticleListItemDto>>, ICachableRequest
+public class GetLatestArticlesExcludingCategoriesQuery : IRequest<GetListResponse<GetListArticleListItemDto>>
 {
     public int MaxResult { get; set; }
     public string[] ExcludeCategories { get; set; }
 
-    public bool BypassCache { get; set; }
-   
-    public string CacheKey => $"GetMixedLatestArticles({MaxResult},[{string.Join(",", ExcludeCategories)}])";
-    public string CacheGroupKey => "GetMixedArticles";
-    public TimeSpan? SlidingExpiration { get; set; }
-}
 
-public class GetMixedLatestArticlesQueryHandler : IRequestHandler<GetLatestArticlesExcludingCategoriesQuery, GetListResponse<GetListArticleListItemDto>>
-{
-    private readonly IArticleRepository _articleRepository;
-    private readonly IMapper _mapper;
-
-    public GetMixedLatestArticlesQueryHandler(IArticleRepository articleRepository, IMapper mapper)
+    public class GetMixedLatestArticlesQueryHandler : IRequestHandler<GetLatestArticlesExcludingCategoriesQuery, GetListResponse<GetListArticleListItemDto>>
     {
-        _articleRepository = articleRepository;
-        _mapper = mapper;
-    }
+        private readonly IArticleRepository _articleRepository;
+        private readonly IMapper _mapper;
 
-    public async Task<GetListResponse<GetListArticleListItemDto>> Handle(GetLatestArticlesExcludingCategoriesQuery request, CancellationToken cancellationToken)
-    {
-        
-        var articles = await _articleRepository.GetListAsync(
-            include: s => s.Include(subCategory => subCategory.SubCategory),
-            predicate: article => !request.ExcludeCategories.Contains(article.SubCategory.Name),
-            size: request.MaxResult,
-            orderBy: x => x.OrderByDescending(a => a.CreatedDate),
-            cancellationToken: cancellationToken
-        );
+        public GetMixedLatestArticlesQueryHandler(IArticleRepository articleRepository, IMapper mapper)
+        {
+            _articleRepository = articleRepository;
+            _mapper = mapper;
+        }
 
-        GetListResponse<GetListArticleListItemDto> response = _mapper.Map<GetListResponse<GetListArticleListItemDto>>(articles);
-        return response;
+        public async Task<GetListResponse<GetListArticleListItemDto>> Handle(GetLatestArticlesExcludingCategoriesQuery request, CancellationToken cancellationToken)
+        {
+
+            var articles = await _articleRepository.GetListAsync(
+                include: s => s.Include(subCategory => subCategory.SubCategory),
+                predicate: article => !request.ExcludeCategories.Contains(article.SubCategory.Name),
+                size: request.MaxResult,
+                orderBy: x => x.OrderByDescending(a => a.CreatedDate),
+                cancellationToken: cancellationToken
+            );
+
+            GetListResponse<GetListArticleListItemDto> response = _mapper.Map<GetListResponse<GetListArticleListItemDto>>(articles);
+            return response;
+        }
     }
 }

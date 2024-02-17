@@ -12,11 +12,9 @@ using static Application.Features.Columnists.Constants.ColumnistsOperationClaims
 
 namespace Application.Features.Columnists.Queries.GetList;
 
-public class GetListColumnistQuery : IRequest<GetListResponse<GetListColumnistListItemDto>>, ISecuredRequest, ICachableRequest
+public class GetListColumnistQuery : IRequest<GetListResponse<GetListColumnistListItemDto>>, ICachableRequest
 {
     public PageRequest PageRequest { get; set; }
-
-    public string[] Roles => new[] { Admin, Read };
 
     public bool BypassCache { get; }
     public string CacheKey => $"GetListColumnists({PageRequest.PageIndex},{PageRequest.PageSize})";

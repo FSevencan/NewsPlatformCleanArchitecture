@@ -45,10 +45,11 @@ public class ColumnArticlesController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetList([FromQuery] PageRequest pageRequest)
+    public async Task<IActionResult> GetList([FromQuery] PageRequest pageRequest, [FromQuery] Guid? categoryId)
     {
-        GetListColumnArticleQuery getListColumnArticleQuery = new() { PageRequest = pageRequest };
-        GetListResponse<GetListColumnArticleListItemDto> response = await Mediator.Send(getListColumnArticleQuery);
+       
+        GetListColumnArticleQuery query = new() { PageRequest = pageRequest, CategoryId = categoryId };
+        GetListResponse<GetListColumnArticleListItemDto> response = await Mediator.Send(query);
         return Ok(response);
     }
 }

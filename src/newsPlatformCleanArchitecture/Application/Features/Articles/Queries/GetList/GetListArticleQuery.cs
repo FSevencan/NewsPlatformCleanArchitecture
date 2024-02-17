@@ -13,16 +13,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Articles.Queries.GetList;
 
-public class GetListArticleQuery : IRequest<GetListResponse<GetListArticleListItemDto>>/*, ISecuredRequest*/, ICachableRequest
+public class GetListArticleQuery : IRequest<GetListResponse<GetListArticleListItemDto>>
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => new[] { Admin, Read };
-
-    public bool BypassCache { get; }
-    public string CacheKey => $"GetListArticles({PageRequest.PageIndex},{PageRequest.PageSize})";
-    public string CacheGroupKey => "GetArticles";
-    public TimeSpan? SlidingExpiration { get; }
 
     public class GetListArticleQueryHandler : IRequestHandler<GetListArticleQuery, GetListResponse<GetListArticleListItemDto>>
     {

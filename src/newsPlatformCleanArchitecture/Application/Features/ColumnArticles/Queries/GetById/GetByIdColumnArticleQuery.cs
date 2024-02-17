@@ -5,15 +5,13 @@ using AutoMapper;
 using Domain.Entities;
 using Core.Application.Pipelines.Authorization;
 using MediatR;
-using static Application.Features.ColumnArticles.Constants.ColumnArticlesOperationClaims;
+
 
 namespace Application.Features.ColumnArticles.Queries.GetById;
 
-public class GetByIdColumnArticleQuery : IRequest<GetByIdColumnArticleResponse>, ISecuredRequest
+public class GetByIdColumnArticleQuery : IRequest<GetByIdColumnArticleResponse>
 {
     public Guid Id { get; set; }
-
-    public string[] Roles => new[] { Admin, Read };
 
     public class GetByIdColumnArticleQueryHandler : IRequestHandler<GetByIdColumnArticleQuery, GetByIdColumnArticleResponse>
     {

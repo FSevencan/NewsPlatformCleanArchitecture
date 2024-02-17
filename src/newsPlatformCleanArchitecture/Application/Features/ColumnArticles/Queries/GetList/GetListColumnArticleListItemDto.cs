@@ -8,8 +8,11 @@ public class GetListColumnArticleListItemDto : IDto
     public Guid Id { get; set; }
     public Guid ColumnistId { get; set; }
     public Guid CategoryId { get; set; }
+    public string ColumnistName { get; set; }
+    public string CategoryName { get; set; }
     public string Title { get; set; }
     public string Content { get; set; }
     public string FeaturedImage { get; set; }
-    
+    public DateTime CreatedDate { get; set; }
+
 }

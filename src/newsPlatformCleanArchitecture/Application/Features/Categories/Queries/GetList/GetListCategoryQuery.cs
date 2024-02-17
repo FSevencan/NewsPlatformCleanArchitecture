@@ -13,16 +13,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Application.Features.Categories.Queries.GetList;
 
-public class GetListCategoryQuery : IRequest<GetListResponse<GetListCategoryListItemDto>>/*, ISecuredRequest*/, ICachableRequest
+public class GetListCategoryQuery : IRequest<GetListResponse<GetListCategoryListItemDto>>
 {
     public PageRequest PageRequest { get; set; }
 
-    public string[] Roles => new[] { Admin, Read };
-
-    public bool BypassCache { get; }
-    public string CacheKey => $"GetListCategories({PageRequest.PageIndex},{PageRequest.PageSize})";
-    public string CacheGroupKey => "GetCategories";
-    public TimeSpan? SlidingExpiration { get; }
+    
 
     public class GetListCategoryQueryHandler : IRequestHandler<GetListCategoryQuery, GetListResponse<GetListCategoryListItemDto>>
     {
