@@ -7,6 +7,7 @@ using AutoMapper;
 using Core.Application.Responses;
 using Domain.Entities;
 using Core.Persistence.Paging;
+using Application.Features.ColumnArticles.Queries.GetBySlug;
 
 namespace Application.Features.ColumnArticles.Profiles;
 
@@ -21,6 +22,7 @@ public class MappingProfiles : Profile
         CreateMap<ColumnArticle, DeleteColumnArticleCommand>().ReverseMap();
         CreateMap<ColumnArticle, DeletedColumnArticleResponse>().ReverseMap();
         CreateMap<ColumnArticle, GetByIdColumnArticleResponse>().ReverseMap();
+        CreateMap<ColumnArticle, GetColumnArticleBySlugResponse>().ReverseMap();
 
         CreateMap<ColumnArticle, GetListColumnArticleListItemDto>()
        .ForMember(dest => dest.ColumnistName, opt => opt.MapFrom(src => src.Columnist.Name))
