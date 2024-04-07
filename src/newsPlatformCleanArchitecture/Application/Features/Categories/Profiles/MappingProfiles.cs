@@ -8,6 +8,7 @@ using Core.Application.Responses;
 using Domain.Entities;
 using Core.Persistence.Paging;
 using Application.Features.Categories.Queries.GetArticlesByCategory;
+using Application.Features.Categories.Queries.GetCategoryTree;
 
 namespace Application.Features.Categories.Profiles;
 
@@ -22,11 +23,13 @@ public class MappingProfiles : Profile
         CreateMap<Category, DeleteCategoryCommand>().ReverseMap();
         CreateMap<Category, DeletedCategoryResponse>().ReverseMap();
         CreateMap<Category, GetByIdCategoryResponse>().ReverseMap();
+        CreateMap<Category, GetCategoryDto>().ReverseMap();
 
         CreateMap<Category, GetListCategoryListItemDto>()
         .ForMember(dest => dest.TotalArticleCount, opt => opt.MapFrom(src => src.SubCategories.Sum(sc => sc.Articles.Count)));
 
         CreateMap<IPaginate<Category>, GetListResponse<GetListCategoryListItemDto>>().ReverseMap();
+        CreateMap<IPaginate<Category>, GetListResponse<GetCategoryDto>>().ReverseMap();
 
        
     }

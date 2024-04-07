@@ -7,6 +7,7 @@ using AutoMapper;
 using Core.Application.Responses;
 using Domain.Entities;
 using Core.Persistence.Paging;
+using Application.Features.Categories.Queries.GetCategoryTree;
 
 namespace Application.Features.SubCategories.Profiles;
 
@@ -22,6 +23,7 @@ public class MappingProfiles : Profile
         CreateMap<SubCategory, DeletedSubCategoryResponse>().ReverseMap();
         CreateMap<SubCategory, GetByIdSubCategoryResponse>().ReverseMap();
         CreateMap<SubCategory, GetListSubCategoryListItemDto>().ReverseMap();
+        CreateMap<SubCategory, GetSubCategoryDto>().ReverseMap();
         CreateMap<IPaginate<SubCategory>, GetListResponse<GetListSubCategoryListItemDto>>().ReverseMap();
     }
 }

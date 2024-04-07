@@ -10,7 +10,7 @@ public class SubCategory : Entity<Guid>
 {
     public string Name { get; set; }
     public Guid CategoryId { get; set; }
-    public Category Category { get; set; }
+    public Category? Category { get; set; }
 
     public ICollection<Article>? Articles { get; set; }
 }

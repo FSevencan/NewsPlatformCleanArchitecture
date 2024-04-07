@@ -3,6 +3,7 @@ using Application.Features.Categories.Commands.Delete;
 using Application.Features.Categories.Commands.Update;
 using Application.Features.Categories.Queries.GetArticlesByCategory;
 using Application.Features.Categories.Queries.GetById;
+using Application.Features.Categories.Queries.GetCategoryTree;
 using Application.Features.Categories.Queries.GetList;
 using Application.Features.Tags.Queries.GetArticlesByTag;
 using Core.Application.Requests;
@@ -65,6 +66,12 @@ public class CategoriesController : BaseController
         GetListResponse<GetArticleByCategoryListDto> response = await Mediator.Send(getArticlesByCategoryQuery);
         return Ok(response);
     }
-   
 
+    [HttpGet("tree")]
+    public async Task<IActionResult> GetCategoriesTree([FromQuery] PageRequest pageRequest)
+    {
+        GetCategoryTreeQuery getCategoryTreeQuery = new() { PageRequest = pageRequest };
+        GetListResponse<GetCategoryDto> response = await Mediator.Send(getCategoryTreeQuery);
+        return Ok(response);
+    }
 }

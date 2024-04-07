@@ -9,11 +9,9 @@ using static Application.Features.Categories.Constants.CategoriesOperationClaims
 
 namespace Application.Features.Categories.Queries.GetById;
 
-public class GetByIdCategoryQuery : IRequest<GetByIdCategoryResponse>, ISecuredRequest
+public class GetByIdCategoryQuery : IRequest<GetByIdCategoryResponse>
 {
     public Guid Id { get; set; }
-
-    public string[] Roles => new[] { Admin, Read };
 
     public class GetByIdCategoryQueryHandler : IRequestHandler<GetByIdCategoryQuery, GetByIdCategoryResponse>
     {
