@@ -1,16 +1,19 @@
 using Application;
 using Application.Services.Middleware;
 using Core.CrossCuttingConcerns.Exceptions.Extensions;
+using Core.CrossCuttingConcerns.Exceptions.Types;
 using Core.Security;
 using Core.Security.Encryption;
 using Core.Security.JWT;
 using Core.WebAPI.Extensions.Swagger;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Persistence;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using System.Text.Json;
 using WebAPI;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -85,8 +88,43 @@ if (app.Environment.IsDevelopment())
     {
         opt.DocExpansion(DocExpansion.None);
     });
+    app.UseDeveloperExceptionPage();
 }
+else
+{
 
+    app.UseExceptionHandler(appError =>
+    {
+        appError.Run(async context =>
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            context.Response.ContentType = "application/json";
+            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+
+            var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+            if (contextFeature != null)
+            {
+                Console.WriteLine($"Something went wrong: {contextFeature.Error}");
+
+                var message = "Internal Server Error. Please try again later.";
+                var statusCode = context.Response.StatusCode;
+
+                if (contextFeature.Error is BusinessException businessException)
+                {
+                    message = businessException.Message;
+                    statusCode = StatusCodes.Status400BadRequest;
+                    context.Response.StatusCode = statusCode;
+                }
+
+                await context.Response.WriteAsync(JsonSerializer.Serialize(new
+                {
+                    StatusCode = statusCode,
+                    Message = message
+                }));
+            }
+        });
+    });
+}
 
 
 app.UseHttpsRedirection();
